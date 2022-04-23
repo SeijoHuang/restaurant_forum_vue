@@ -222,6 +222,7 @@ export default {
         if(restaurant.id === restaurantId) {
           const currentUserIndex = restaurant.FavoritedUsers.indexOf(this.currentUser.id)
           restaurant.FavoritedUsers.splice(currentUserIndex, 1)
+          restaurant.isFavorited = false
         }    
         return restaurant
       })
@@ -231,7 +232,8 @@ export default {
       this.restaurants = this.restaurants.map(restaurant => {
         if(restaurant.id === restaurantId) {
           console.log(this.currentUser.id)
-          restaurant.FavoritedUsers.push(this.currentUser.id)         
+          restaurant.FavoritedUsers.push(this.currentUser.id)
+          restaurant.isFavorited = true         
         }
         return restaurant       
       })
