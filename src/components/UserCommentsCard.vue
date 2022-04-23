@@ -24,7 +24,7 @@ export default {
   props: {
     userComments: {
       type: Array,
-      required: [true, false]
+      default: () => [] 
     }
   }
 }

@@ -28,7 +28,7 @@ export default {
   props:{
     userFollowers: {
       type: Array,
-      required: true
+      default: () => [] 
     }
   }
 }

@@ -24,7 +24,8 @@ export default {
     props: {
         userFollowings:{
             type: Array,
-            required: true
+            default: () => [] 
+            //預設為空陣列  
         }
     }
 }
