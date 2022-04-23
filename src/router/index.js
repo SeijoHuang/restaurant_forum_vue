@@ -52,6 +52,11 @@ const routes = [
     name: 'users-top',
     component: () => import('../views/UsersTop')
   },
+  {
+    path: '/user/:id',
+    name: 'user',
+    component: () => import('../views/User')
+  },
  
   {
     path: '*',
