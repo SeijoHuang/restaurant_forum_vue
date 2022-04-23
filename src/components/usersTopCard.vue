@@ -2,9 +2,9 @@
   <div class="col-3">
     <router-link 
       :to="{
-        name:'users-top',
-        query: {
-          userId: user.id
+        name:'user',
+        params: {
+          id: user.id
         }
       }"
     >

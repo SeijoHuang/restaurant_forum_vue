@@ -1,12 +1,17 @@
 <template>
   <div class="row no-gutters">
     <div class="col-md-4">
-        <a href="#">
+        <router-link 
+          :to="{
+            name: 'restaurant',
+            params: {id: restaurant.id}
+          }"
+        >
           <img
             class="card-img"
             :src="restaurant.image"
           >
-        </a>
+        </router-link>
       </div>
       <div class="col-md-8">
         <div class="card-body">
@@ -66,23 +71,24 @@ export default {
   },
   methods: {
     addFavorite(restaurantId){
-      console.log('add')
-      this.restaurant = {
-        ...this.restaurant,
-        isFavorited: true
-      }
       //TODO 串API新增我的最愛
-      console.log('add',restaurantId)
       this.$emit('after-add-favorite', restaurantId)
+      // 下方程式碼的動作直接在父元件修改資料，子元件會一起連動，故不需要
+      // this.restaurant = {
+      //   ...this.restaurant,
+      //   isFavorited: true
+      // }
+      
     },
     removeFavorite(restaurantId){
-      this.restaurant = {
-        ...this.restaurant,
-        isFavorited: false
-      }
       //TODO 串API移除我的最愛
-      console.log(restaurantId)
       this.$emit('after-remove-favorite', restaurantId)
+      // 下方程式碼的動作直接在父元件修改資料，子元件會一起連動，故不需要
+      // this.restaurant = {
+      //   ...this.restaurant,
+      //   isFavorited: false
+      // }
+      
     }
   }
 }
