@@ -38,23 +38,6 @@
           {{page}}
         </router-link>
       </li>
-      <!-- <li class="page-item">
-        <a
-          class="page-link"
-          href="#"
-        >
-          2
-        </a>
-      </li>
-      <li class="page-item">
-        <a
-          class="page-link"
-          href="#"
-        >
-          3
-        </a>
-      </li> -->
-
       <!-- 後一頁 nextPage -->
       <li 
         :class="['page-item', { disabled: currentPage === totalPage.length }]">
