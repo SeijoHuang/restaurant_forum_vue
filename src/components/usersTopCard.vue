@@ -9,7 +9,7 @@
       }"
     >
       <img
-        :src="user.image"
+        :src="user.image | emptyImage"
         width="140px"
         height="140px"
       >
@@ -38,7 +38,10 @@
 </template>
 
 <script>
+import {EmptyImageFilter} from './../utils/mixins'
 export default {
+  name: 'usersTopCard',
+  mixins: [ EmptyImageFilter ],
   props: {
     initialUser:{
       type: Object,
