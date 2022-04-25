@@ -21,7 +21,7 @@
           <router-link 
             :to="{
               name: 'user',
-              params: {id: comment.userId}
+              params: {id: comment.User.id}
             }"
           >
             {{comment.User.name}}

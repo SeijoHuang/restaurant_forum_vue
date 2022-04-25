@@ -9,7 +9,7 @@
         >
           <img
             class="card-img"
-            :src="restaurant.image"
+            :src="restaurant.image | emptyImage"
           >
         </router-link>
       </div>
@@ -55,9 +55,10 @@
 </template>
 
 <script>
-
+import {EmptyImageFilter} from './../utils/mixins'
 export default {
   name:"RestaurantsTopCard",
+  mixins: [ EmptyImageFilter ],
   props: {
     initialRestaurantsTop:{
       type: Object,

@@ -8,3 +8,11 @@ export const FromNowFilter = {
     }
   } 
 }
+
+export const EmptyImageFilter = {
+  filters :{
+    emptyImage(image){
+      return image || 'https://via.placeholder.com/350x220/DFDFDF?text=No+Image'
+    }
+  }
+}
