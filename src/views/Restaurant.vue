@@ -192,6 +192,7 @@ export default {
   },
   created(){
     const {id} = this.$route.params
+    //透過$route拿到網址的參數
     this.fetchRestaurant(id)
   }
 }
