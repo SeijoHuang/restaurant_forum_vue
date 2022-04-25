@@ -13,7 +13,7 @@
             }"
             >
             <img 
-              :src="follower.image" 
+              :src="follower.image | emptyImage" 
               width="60" height="60" 
               class="avatar"
             >
@@ -23,8 +23,10 @@
 </template>
 
 <script>
+import {EmptyImageFilter} from './../utils/mixins'
 export default {
   name: 'userFollowersCard',
+  mixins: [ EmptyImageFilter ],
   props:{
     userFollowers: {
       type: Array,

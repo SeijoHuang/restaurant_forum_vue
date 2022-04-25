@@ -12,15 +12,17 @@
                 params: { id: following.id} 
             }"
           >
-              <img :src="following.image" width="60" height="60" class="avatar">
+              <img :src="following.image | emptyImage" width="60" height="60" class="avatar">
           </router-link>
          
       </div>
     </div>
 </template>
 <script>
+import {EmptyImageFilter} from './../utils/mixins'
 export default {
     name:"UserFollowingCard",
+    mixins: [ EmptyImageFilter ],
     props: {
         userFollowings:{
             type: Array,

@@ -3,7 +3,7 @@
     <div class="row no-gutters">
       <div class="col-md-4">
           <img 
-            :src="userProfile.image" 
+            :src="userProfile.image | emptyImage" 
             width="300px" height="300px"
           >
       </div>
@@ -40,13 +40,17 @@
             </li>
           </ul>
           <form action="/following/1?_method=DELETE" method="POST" style="display: contents;">
-            <button 
+            <router-link :to="{
+              name:'user-edit',
+              params: {id: userProfile.id}
+            }"
               v-if= "currentUser.id === userProfile.id"
               @click.stop.prevent="follow(true)"
               type="submit" 
-              class="btn btn-primary">
-              edit            
-            </button>
+              class="btn btn-primary"
+              >
+              edit          
+            </router-link>
             <div v-else>
               <button 
                 v-if="userProfile.isFollowed"
@@ -62,9 +66,7 @@
                 class="btn btn-primary">
                 追蹤            
               </button>
-            </div>
-           
-
+            </div>          
           </form>
         </div>
       </div>
@@ -73,7 +75,10 @@
 </template>
 
 <script>
+import {EmptyImageFilter} from './../utils/mixins'
 export default {
+  name: 'UserProfileCard',
+  mixins: [ EmptyImageFilter ],
   props: {
     initialUserprofile: {
       type: Object,

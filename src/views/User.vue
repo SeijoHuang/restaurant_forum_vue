@@ -22,7 +22,7 @@
       </div>
       <div class="col-md-8">
           <!-- user comment card -->
-        <UserCommentsCard 
+        <UserCommentsCard
           :user-comments="user.Comments"
         />
         <br>
@@ -1256,7 +1256,8 @@ export default {
     }
   },
   methods: {
-    fetchUser(){
+    fetchUser(UserId){
+      console.log('拿取資料', UserId)
       const {profile, isFollowed} = dummyData
       const {id, name, email, image, Comments, FavoritedRestaurants, Followers, Followings} = profile
       this.user = {
@@ -1280,7 +1281,7 @@ export default {
     
   },
   created (){
-    this.fetchUser()
+    this.fetchUser(this.$route.params)
   }
 }
 </script>
