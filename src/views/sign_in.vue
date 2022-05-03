@@ -36,10 +36,10 @@
         >
       </div>
 
-      <button
-        
+      <button        
         class="btn btn-lg btn-primary btn-block mb-3"
         type="submit"
+        :disabled="isProcessing"
       >
         Submit
       </button>
@@ -58,22 +58,96 @@
 </template>
 
 <script>
+import authorizationAPI from "../apis/authorization"
+import {Toast} from "../utils/helpers"
 export default {
   data(){
     return {
       email: '',
-      password: ''
+      password: '',
+      isProcessing: false
     }
   },
   methods: {
-      handleSubmit(){
-        console.log('submit')
-        const data = JSON.stringify({
-          email: this.email,
-          password: this.password
+    async handleSubmit(){
+      try{
+        if(!this.email || !this.password){
+        Toast.fire({
+          icon:'warning',
+          title: '請輸入帳號密碼'
         })
-        console.log(data)
+        return
       }
+      // disable button 避免重複點擊
+      this.isProcessing = true 
+
+      const response = await authorizationAPI.signIn({
+        email: this.email,
+        password: this.password
+      })
+      const {data} = response 
+      if(data.status !== 'success'){
+        throw new Error(data.message)
+      }                  
+      localStorage.setItem('token', data.token)
+      this.$router.push('/restaurants')
+      } catch (error) {
+        this.isProcessing = false
+      // 清空密碼欄位
+      this.password = ""
+      // sweet alert
+      Toast.fire({
+        icon: "warning",
+        title:"請輸入正確的帳號密碼"
+      })
+      console.log('error', error)
+      }
+      
+
+    }
+    // promise
+    // handleSubmit(){
+    //   // console.log('submit')
+    //   // const data = JSON.stringify({
+    //   //   email: this.email,
+    //   //   password: this.password
+    //   // })
+    //   // console.log(data)
+    //   if(!this.email || !this.password){
+    //     Toast.fire({
+    //       icon:'error',
+    //       title: '請輸入帳號密碼'
+    //     })
+    //     return
+    //   }
+    //   // disable button 避免重複點擊
+    //   this.isProcessing = true 
+
+    //   authorizationAPI
+    //   .signIn({
+    //   email: this.email,
+    //   password: this.password
+    //   })
+    //   .then( response => {
+    //   const {data} = response 
+    //   if(data.status !== 'success'){
+    //     throw new Error(data.message)
+    //   }                  
+    //   localStorage.setItem('token', data.token)
+    //   this.$router.push('/restaurants')
+    //   })
+    //   .catch(error => {
+    //   this.isProcessing = false
+    //   // 清空密碼欄位
+    //   this.password = ""
+    //   // sweet alert
+    //   Toast.fire({
+    //     icon: "warning",
+    //     title:"請輸入正確的帳號密碼"
+    //   })
+    //   console.log('error', error)
+    //   })
+    // }
   }
 }
 </script>
