@@ -44,28 +44,8 @@
 </template>
 <script>
 import {EmptyImageFilter} from './../utils/mixins'
-
-const DummyData = {
-    "restaurant": {
-        "id": 2,
-        "name": "Hilbert Sanford",
-        "tel": "352.762.0824 x46507",
-        "address": "071 Otho Hill",
-        "opening_hours": "08:00",
-        "description": "commodi assumenda adipisci",
-        "image": "https://loremflickr.com/320/240/restaurant,food/?random=0.13807102607181765",
-        "viewCounts": 1,
-        "createdAt": "2022-04-20T13:43:42.000Z",
-        "updatedAt": "2022-04-24T07:45:43.000Z",
-        "CategoryId": 5,
-        "Category": {
-            "id": 5,
-            "name": "素食料理",
-            "createdAt": "2022-04-20T13:43:42.000Z",
-            "updatedAt": "2022-04-20T13:43:42.000Z"
-        }
-    }
-}
+import adminAPI from './../apis/admin'
+import {Toast} from './../utils/helpers'
 
 export default {
   name: 'AdminRestaurant',
@@ -85,10 +65,13 @@ export default {
     }
   },
   methods: {
-    fetchRestaurant(fetchRestaurantId) {
-      console.log(fetchRestaurantId)
-      const {restaurant} = DummyData
-      const {id, name, tel, address, description, image, Category, opening_hours: openingHours } = restaurant
+   async fetchRestaurant(fetchRestaurantId) {
+     try{
+       const response = await adminAPI.restaurants.getDetail({restaurantId: fetchRestaurantId})      
+      if(response.statusText !== 'OK'){
+        throw new Error (response.statusText)
+      }
+      const {id, name, tel, address, description, image, Category, opening_hours: openingHours } = response.data.restaurant
       this.restaurant = {
         ...this.restaurant,
         id,
@@ -100,7 +83,19 @@ export default {
         categoryName: Category? Category.name : '未分類',
         openingHours
       }
+     }catch(error){
+       Toast.fire({
+         icon:'error',
+         title:'無法取得餐廳資料，請稍後再試'
+       })
+     }
+     
     } 
+  },
+  beforeRouteUpdate(to, next){
+    const {id} = to.params
+    this.fetchRestaurant(id)
+    next()
   },
   mounted() {
     const {id: restaurantId} = this.$route.params

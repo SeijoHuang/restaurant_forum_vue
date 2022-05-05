@@ -1,5 +1,7 @@
 <template>
-  <form @submit.stop.prevent="handleSubmit">
+  <form
+    v-show="!isLoading"
+    @submit.stop.prevent="handleSubmit">
     <div class="form-group">
       <label for="name">Name</label>
       <input
@@ -16,7 +18,7 @@
     <div class="form-group">
       <label for="categoryId">Category</label>
       <select
-        v-model="restaurant.categoryId"
+        v-model="restaurant.CategoryId"
         id="categoryId"
         class="form-control"
         name="categoryId"
@@ -33,6 +35,7 @@
           v-for=" category in categories"
           :key=" category.id "
           :value=" category.id"
+          
         >
           {{category.name}}
         </option>       
@@ -108,59 +111,17 @@
     <button
       type="submit"
       class="btn btn-primary"
+      :disabled="isProcessing"
     >
-      送出
+      {{isProcessing? '處理中...':'送出'}}
     </button>
   </form>
 </template>
 
 <script>
-const DummyCategories= {
-    "categories": [
-        {
-            "id": 1,
-            "name": "中式料理",
-            "createdAt": "2022-04-20T13:43:42.000Z",
-            "updatedAt": "2022-04-20T13:43:42.000Z"
-        },
-        {
-            "id": 2,
-            "name": "日本料理",
-            "createdAt": "2022-04-20T13:43:42.000Z",
-            "updatedAt": "2022-04-20T13:43:42.000Z"
-        },
-        {
-            "id": 3,
-            "name": "義大利料理",
-            "createdAt": "2022-04-20T13:43:42.000Z",
-            "updatedAt": "2022-04-20T13:43:42.000Z"
-        },
-        {
-            "id": 4,
-            "name": "墨西哥料理",
-            "createdAt": "2022-04-20T13:43:42.000Z",
-            "updatedAt": "2022-04-20T13:43:42.000Z"
-        },
-        {
-            "id": 5,
-            "name": "素食料理",
-            "createdAt": "2022-04-20T13:43:42.000Z",
-            "updatedAt": "2022-04-20T13:43:42.000Z"
-        },
-        {
-            "id": 6,
-            "name": "美式料理",
-            "createdAt": "2022-04-20T13:43:42.000Z",
-            "updatedAt": "2022-04-20T13:43:42.000Z"
-        },
-        {
-            "id": 7,
-            "name": "複合式料理",
-            "createdAt": "2022-04-20T13:43:42.000Z",
-            "updatedAt": "2022-04-20T13:43:42.000Z"
-        }
-    ]
-} 
+import adminAPI from './../apis/admin'
+import {Toast} from './../utils/helpers'
+
 export default {
   name: 'AdminRestaurantForm',
   props: {
@@ -170,7 +131,7 @@ export default {
         return {
           // 設定預設值，當沒有資料傳入時，會使用這一組資料，也就是在新增新的餐廳資料時，會帶入此預設值
           name: '',
-          categoryId: -1,
+          CategoryId: '',
           tel: '',
           address: '',
           openingHours: '',
@@ -178,21 +139,37 @@ export default {
           image: '',
         }
       }
-    }    
+    } ,
+    isProcessing:{
+      type: Boolean,
+      default: false
+    }   
   },
   data() {
     return {
       categories: [],
       restaurant: {
         ...this.initialRestaurant
-      }
+      },
+      isLoading: true
     }
   },
   methods :{
-    fetchCategories() {
-      this.categories = DummyCategories.categories
+    async fetchCategories() {
+      try{
+        const {data} = await adminAPI.categories.get()
+        this.isLoading = false
+        this.categories = data.categories
+      }catch(error){
+        this.isLoading = false
+        Toast.fire({
+          icon:'error',
+          title: '無法載入餐廳類別，請稍後再試'
+        })
+      }     
     },
     handleFileChange(e){
+    
     const file = e.target.files //會回傳file物件 
     if(file.length === 0) {
       // 沒有上傳像相片
@@ -204,6 +181,19 @@ export default {
     }   
     },
     handleSubmit(e){
+      if(!this.restaurant.name){
+        Toast.fire({
+          icon:'warning',
+          title:'請輸入餐廳名稱'         
+        })
+        return
+      } else if (!this.restaurant.CategoryId){
+        Toast.fire({
+          icon:'warning',
+          title:'請輸入餐廳類別'
+        })
+        return
+      }
       const form = e.target
       const formData = new FormData(form)
       
@@ -212,6 +202,24 @@ export default {
   },
   created() {
     this.fetchCategories()
+  },
+  watch:{
+    // initialRestaurant:{
+    //   deep:true,
+    //   handler:function(){
+    //     this.restaurant = {
+    //       ...this.initialRestaurant
+    //     }
+    //   }
+    // }
+    initialRestaurant(newValue){
+      this.restaurant = {
+        //避免新的值有些資料沒有被給到，所以載入舊有的資料，在覆蓋上有更新的新資料
+        ...this.restaurant,
+        ...newValue
+      }
+
+    }
   }
   
 }
