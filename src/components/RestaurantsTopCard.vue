@@ -43,7 +43,7 @@
           <button
             v-else
             type="button"
-            @click="addFavorite(restaurant.id)"
+            @click="addFavorite"
             class="btn btn-primary"
           >
             加到最愛
@@ -71,24 +71,19 @@ export default {
     }
   },
   methods: {
-    addFavorite(restaurantId){
-      //TODO 串API新增我的最愛
-      this.$emit('after-add-favorite', restaurantId)
-      // 下方程式碼的動作直接在父元件修改資料，子元件會一起連動，故不需要
-      // this.restaurant = {
-      //   ...this.restaurant,
-      //   isFavorited: true
-      // }
-      
+    async addFavorite(){
+      this.restaurant = {
+        ...this.restaurant,
+        isFavorited: true
+      }
+      this.$emit('after-add-favorite', this.restaurant)      
     },
     removeFavorite(restaurantId){
-      //TODO 串API移除我的最愛
+      this.restaurant = {
+        ...this.restaurant,
+        isFavorited: false
+      }
       this.$emit('after-remove-favorite', restaurantId)
-      // 下方程式碼的動作直接在父元件修改資料，子元件會一起連動，故不需要
-      // this.restaurant = {
-      //   ...this.restaurant,
-      //   isFavorited: false
-      // }
       
     }
   }
