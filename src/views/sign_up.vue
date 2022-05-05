@@ -67,8 +67,9 @@
       <button
         class="btn btn-lg btn-primary btn-block mb-3"
         type="submit"
+        :disabled="isProcessing"
       >
-        Submit
+        {{isProcessing? '處理中...' : 'Submit'}}
       </button>
 
       <div class="text-center mb-3">
@@ -86,26 +87,57 @@
   </div>
 </template>
 <script>
+import authorizationAPI from './../apis/authorization'
+import {Toast} from './../utils/helpers'
 export default {
   data(){
     return {
       name: '',
       email: '',
       password: '',
-      passwordCheck: ''
+      passwordCheck: '',
+      isProcessing: false
     }
   },
   methods: {
-    handleSingUp(){
-      const data = JSON.stringify(
-        {
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        passwordCheck: this.passwordCheck
+    async handleSingUp(){
+      try{
+        if(!this.name || !this.email || !this.password || !this.passwordCheck){
+          Toast.fire({
+            icon:'warning',
+            title: '請確認所有欄位已填寫'
+          })
+          return
         }
-      ) 
-      console.log('signup', data)
+        if(this.password !== this.passwordCheck){
+          Toast.fire({
+            icon:'warning',
+            title: '兩次輸入的密碼不同，請再次確認'
+          })
+          return
+        }
+        this.isProcessing = true
+        const {data} = await authorizationAPI.signUp({         
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          passwordCheck: this.passwordCheck
+        })
+        if(data.status !== 'success'){
+          throw new Error(
+            data.message
+          )
+        }
+        this.$router.push({name:'sing_in'}) 
+
+      }catch(error){
+        this.isProcessing = false
+        Toast.fire({
+          icon:'error',
+          title:'無法註冊，請稍後再試'
+        })
+      }
+      
     }
   }
 }
