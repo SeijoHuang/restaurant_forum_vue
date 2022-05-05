@@ -7,7 +7,7 @@
       <div class="form-row">
         <div class="col-auto">
           <input
-            v-model.trim="newCategoryByName"
+            v-model.trim="newCategoryName"
             type="text"
             class="form-control"
             placeholder="新增餐廳類別..."
@@ -15,11 +15,12 @@
         </div>
         <div class="col-auto">
           <button
-            @click.stop.prevent="addCategory(newCategoryByName)"
+            :disabled ="isProcessing"
+            @click.stop.prevent="addCategory"
             type="button"
             class="btn btn-primary"
           >
-            新增
+            {{isProcessing? '處理中': '新增'}}
           </button>
         </div>
       </div>
@@ -104,36 +105,12 @@
 </template>
 
 <script>
-import { v4 as uuidv4 } from 'uuid'
+// import { v4 as uuidv4 } from 'uuid'
 import AdminNav from './../components/AdminNav.vue'
-const dummyData = {
-  categories: [
-    {
-      id: 1,
-      name: '中式料理',
-      createdAt: '2019-06-22T09:00:43.000Z',
-      updatedAt: '2019-06-22T09:00:43.000Z'
-    },
-    {
-      id: 2,
-      name: '日本料理',
-      createdAt: '2019-06-22T09:00:43.000Z',
-      updatedAt: '2019-06-22T09:00:43.000Z'
-    },
-    {
-      id: 3,
-      name: '義大利料理',
-      createdAt: '2019-06-22T09:00:43.000Z',
-      updatedAt: '2019-06-22T09:00:43.000Z'
-    },
-    {
-      id: 4,
-      name: '墨西哥料理',
-      createdAt: '2019-06-22T09:00:43.000Z',
-      updatedAt: '2019-06-22T09:00:43.000Z'
-    }
-  ]
-}
+import adminAPI from './../apis/admin'
+import {Toast} from './../utils/helpers'
+
+
 export default {
   components: {
     AdminNav
@@ -141,26 +118,62 @@ export default {
   data(){
     return {
       categories: [],
-      newCategoryByName: ''
+      newCategoryName: '',
+      isProcessing: false
     }
   },
   methods: {
-    fetchCategories(){
-      this.categories = dummyData.categories.map(category => ({
+    async fetchCategories(){
+      try{
+        const response = await adminAPI.categories.get()
+        if(response.statusText !== 'OK') {
+          throw new Error(response.statusText)
+        }
+        this.categories = response.data.categories.map(category => ({
         ...category,
         isEditing: false,
         nameCached: ''
       }))
+      }catch(error){
+        Toast.fire({
+          icon:'error', 
+          title: '無法載入餐廳類別，請稍後再試'
+        })
+      }      
     },
-    addCategory(newCategoryName){
-      //TODO 串接API 新增category
-      if(!newCategoryName) return
-      alert(`已新增${newCategoryName}`)
-      this.categories.push({
-        id: uuidv4(),
-        name: newCategoryName
-      })
-      this.newCategoryByName = ''
+    async addCategory(){
+      try{
+        if(!this.newCategoryName){
+          Toast.fire({
+            icon: 'warning',
+            title: '請輸入餐廳類別'
+          })
+          return
+        }
+        // 切換處理中 避免多次點擊
+        this.isProcessing = true
+        const {data} = await adminAPI.categories.create({
+          name: this.newCategoryName
+        })
+        console.log(data)
+        if(data.status !== 'success'){
+          throw new Error (data.message)
+        }
+        // 新類別加入陣列，讓畫面能即時呈現，因為data資料會等頁面重新整理時才會像api載入新的資料
+        this.categories.push({
+          id: data.categoryId,
+          name: this.newCategoryName,
+          isEditing: false
+        })
+        this.isProcessing = false
+        this.newCategoryName = ''
+        } catch(error){
+          this.isProcessing = false
+        Toast.fire({
+          icon:'error',
+          title: '無法新增餐廳類別，請稍後再試'
+        })
+      }    
     },
     deleteCategory(categoryId){
       this.categories = this.categories.filter(category => category.id !== categoryId)
@@ -180,7 +193,6 @@ export default {
     },
     handleCancel(categoryId) {
       this.categories = this.categories.map(category => {
-        console.log('cancle')
         if(category.id === categoryId) {
           return {
             ...category,
