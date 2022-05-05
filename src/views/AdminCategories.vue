@@ -175,8 +175,20 @@ export default {
         })
       }    
     },
-    deleteCategory(categoryId){
-      this.categories = this.categories.filter(category => category.id !== categoryId)
+    async deleteCategory(categoryId){
+      try{
+        const {data} = await adminAPI.categories.delete({categoryId})
+        if(data.status !== 'success'){
+          throw new Error(data.message)
+        }
+        this.categories = this.categories.filter(category => category.id !== categoryId)
+      }catch(error){
+        Toast.fire({
+          icon:'error',
+          title: '無法刪除餐廳類別，請稍後再試'
+        })
+      }
+      
     },
     toggleIsEditing(categoryId){
       this.categories = this.categories.map(category => {
@@ -203,11 +215,18 @@ export default {
       })
       this.toggleIsEditing(categoryId)
     },
-    updateCategory({categoryId, name }) {  
+    async updateCategory({categoryId, name }) {  
     //TODO 串接API修改伺服器資料
-      console.log(name)
-      this.toggleIsEditing(categoryId)   
-     
+      try{
+        const {data} = await adminAPI.categories.update({categoryId, name})
+        console.log(data)
+        this.toggleIsEditing(categoryId)
+      }catch(error){
+        Toast.fire({
+          icon:'error',
+          title:'無法修改類別名稱，請稍後再試'
+        })
+      }              
     }
   },
   created(){
