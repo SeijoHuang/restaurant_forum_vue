@@ -219,7 +219,9 @@ export default {
     //TODO 串接API修改伺服器資料
       try{
         const {data} = await adminAPI.categories.update({categoryId, name})
-        console.log(data)
+        if(data.status !== 'success'){
+          throw new Error(data.message)
+        }
         this.toggleIsEditing(categoryId)
       }catch(error){
         Toast.fire({
