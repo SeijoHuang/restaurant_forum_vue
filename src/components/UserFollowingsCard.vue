@@ -29,6 +29,14 @@ export default {
             default: () => [] 
             //預設為空陣列  
         }
+    },
+    watch:{
+        // userFollowings(newValue){
+        //     this.userFollowings = {
+        //         ...this.userFollowings,
+        //         ...newValue
+        //     }
+        // }
     }
 }
 </script>

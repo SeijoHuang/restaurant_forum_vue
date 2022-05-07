@@ -9,7 +9,6 @@ export default {
     //加我的最愛不需要data所以用null
   },
   removeFavorite(restaurantId) {
-    console.log(restaurantId)   
     return apiHelper.delete(`/favorite/${restaurantId}`, {
       headers: { Authorization: `Bearer ${getToken()}` }
     })
@@ -41,6 +40,28 @@ export default {
       headers: { Authorization: `Bearer ${getToken()}`
       }
     })
+  },
+  getCurrentUser(){
+    return apiHelper.get('/get_current_user', {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    })
+  },
+  getUser({userId}){
+    return apiHelper.get(`/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    })
+  },
+  fetchUser({userId}){
+    return apiHelper.get(`/users/${userId}`, {
+      headers: { Authorization: `Bearer ${getToken()}`}
+      
+    })
   }
+
   
-}
+  
+} 

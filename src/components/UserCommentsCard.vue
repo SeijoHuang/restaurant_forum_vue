@@ -1,7 +1,7 @@
 <template>
   <div class="card">
       <div class="card-header">
-        <strong>41</strong> 已評論餐廳
+        <strong>{{userComments.length}}</strong> 已評論餐廳
       </div>
       <div class="card-body">
           <router-link 

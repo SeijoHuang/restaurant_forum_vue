@@ -54,14 +54,14 @@
             <div v-else>
               <button 
                 v-if="userProfile.isFollowed"
-                @click.stop.prevent="unFollow(false)"
+                @click.stop.prevent="unFollow(userProfile.id)"
                 type="submit" 
                 class="btn btn-danger">
                 取消追蹤            
               </button>
               <button 
                 v-else
-                @click.stop.prevent="follow(true)"
+                @click.stop.prevent="follow(userProfile.id)"
                 type="submit" 
                 class="btn btn-primary">
                 追蹤            
@@ -76,6 +76,8 @@
 
 <script>
 import {EmptyImageFilter} from './../utils/mixins'
+import userAPI from './../apis/user'
+import {Toast} from './../utils/helpers'
 export default {
   name: 'UserProfileCard',
   mixins: [ EmptyImageFilter ],
@@ -95,14 +97,51 @@ export default {
     }
   },
   methods: {
-    follow(status){
+   async follow(userId){
       //TODO API請求新增最愛
-      this.$emit('after-follow', status)
+      try{
+        const {data} = await userAPI.addFollowing(userId)
+        if(data.status !== 'success'){
+          throw new Error (data.message)
+        }
+      }catch(error){
+        Toast.fire({
+          icon:'error',
+          title: '無法追蹤用戶，請稍後再試'
+        })
+      }
+      this.userProfile = {
+        ...this.userProfile,
+        isFollowed: true
+      }
+      // this.$emit('after-follow', this.userProfile)
     },
-    unFollow(status){
+    async unFollow(userId){
     //TODO API請求移除最愛
-      this.$emit('after-unfollow', status)
+      try{
+        const {data} = await userAPI.removeFollowing({userId})
+        if(data.status !== 'success'){
+          throw new Error (data.message)
+        }
+        this.userProfile = {
+          ...this.userProfile,
+          isFollowed: false
+        }
+      }catch(error){
+        Toast.fire({
+          icon:'error',
+          title: '無法取消追蹤用戶，請稍後再試'
+        })
+      }
     }
-  }
+  },
+ watch:{
+   initialUserprofile(newValue){
+     this.userProfile = {
+       ...this.userProfile,
+       ...newValue
+     }
+   }
+ }
 }
 </script>
