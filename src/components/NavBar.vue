@@ -60,43 +60,11 @@
 
 <script>
 // seed data
-// 假資料，未串接API時先使用這組資料模擬登錄
-const dummyData = {
-   currentUser: {
-    id: 1,
-    name: '管理者',
-    email: 'root@example.com',
-    image: 'https://i.pravatar.cc/300',
-    isAdmin: true
-  },
-  isAuthenticated: true
-}
+import {mapState} from 'vuex'
 export default {
-  data() {
-    return {
-      // vue在沒有資料時使用此預設值，有外部資歷進來，就會被覆寫
-      currentUser: {
-        id: -1,
-        name: '',
-        email: '',
-        image: '',
-        isAdmin: false
-      },
-      isAuthenticated: false
-    }
-  },
-  methods: {
-    // 向後端拉取資料
-    fetchUser(){
-      this.currentUser = {
-        ...this.currentUser,
-        ...dummyData.currentUser
-      }
-      this.isAuthenticated = dummyData.isAuthenticated      
-    }
-  },
-  created(){
-    this.fetchUser()
+  computed: 
+  {
+    ...mapState(['currentUser', 'isAuthenticated'])
   }
 }
 </script>

@@ -88,8 +88,11 @@ export default {
       const {data} = response 
       if(data.status !== 'success'){
         throw new Error(data.message)
-      }                  
+      }
+      //伺服器回傳的token存進localStorage                  
       localStorage.setItem('token', data.token)
+      //setCurrentUser方法把使用者資料傳入vuex的state中
+      this.$store.commit('setCurrentUser', data.user)
       this.$router.push('/restaurants')
       } catch (error) {
         this.isProcessing = false
