@@ -31,7 +31,7 @@
             name: 'restaurants',
             query:{
               categoryId,
-              page              
+              page             
             }           
           }"
         >

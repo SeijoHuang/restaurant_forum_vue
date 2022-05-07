@@ -88,15 +88,13 @@ export default {
   },
   created() {
     const {page = '', categoryId = ''} = this.$route.query
-    console.log(this.$route.query)
-    console.log(page)
     this.fetchRestaurants({
         queryPage: page,
         queryCategoryId: categoryId
     })  
   },
   beforeRouteUpdate (to, from, next){
-//  當沒有query時代表撈全部資料，會回傳undefine，會無法撈資料，故用page=''給予預設值
+//  當沒有query時，通常代表撈全部資料，會回傳undefine，會無法撈資料，故用page=''給予預設值
        const {page ='', categoryId =''} = to.query
        this.fetchRestaurants({queryPage: page, queryCategoryId: categoryId})
        next()

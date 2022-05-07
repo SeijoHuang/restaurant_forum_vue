@@ -16,10 +16,11 @@
         @click="$router.back()"
       >回上一頁</button>
       <button
+        :disabled="isProcessing"
         type="submit"
         class="btn btn-primary mr-0"
       >
-        Submit
+        {{isProcessing? '處理中' : 'Submit'}}
       </button>
     </div>
   </form>
@@ -27,7 +28,9 @@
 
 <script>
 // 尚未串接API,先用uuid產生id
-import { v4 as uuidv4 } from 'uuid'
+// import { v4 as uuidv4 } from 'uuid'
+import commentAPI from './../apis/comment'
+import {Toast} from './../utils/helpers'
 export default {
   name:"CreateComment",
   props: {
@@ -38,21 +41,45 @@ export default {
   },
   data(){
     return {
-      text:""
+      text:"",
+      isProcessing: false
     }
   },
   methods: {
-    createComment(restaurantId){
-      if(!this.text.length) return
-      console.log('create comment',restaurantId)
+    async  createComment(){
+      try{
+        if(!this.text.length) {
+          Toast.fire({
+            icon:'warning',
+            title: '請輸入評論'
+          })
+          return
+        }
+        this.isProcessing = true
+        const {data} = await commentAPI.createComment({
+          restaurantId: this.restaurantId,
+          text: this.text, 
+      })
+      if(data.status !== 'success'){
+        throw new Error (data.message)
+      }      
       // TODO 向API發送POST請求
       this.$emit('after-create-comment', {
-        commentId: uuidv4(),        
-        restaurantId: this.restaurantId,
-        text: this.text
+          commentId: data.commentId,        
+          restaurantId: this.restaurantId,
+          text: this.text,
         }
       )
+      this.isProcessing = false
       this.text=""
+      } catch(error){
+        this.isProcessing = false
+        Toast.fire({
+          icon:'error',
+          title: '無法新增評論，請稍後再試'
+        })
+      }
+     
     }
   }
 }

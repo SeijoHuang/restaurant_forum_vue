@@ -22,98 +22,11 @@
 import RestaurantDetail from './../components/RestaurantDetail.vue'
 import RestaurantComments from './../components/RestaurantComments.vue'
 import CreateComment from '../components/CreateComment.vue'
+import restaurantsAPI from './../apis/restaurants'
+import {Toast} from './../utils/helpers'
+import {mapState} from 'vuex'
 
-const DummyData = {
-    "restaurant": {
-        "id": 1,
-        "name": "Davion Stamm",
-        "tel": "1-234-637-3337",
-        "address": "6245 Joannie Summit",
-        "opening_hours": "08:00",
-        "description": "laudantium",
-        "image": "https://loremflickr.com/320/240/restaurant,food/?random=93.79875395670301",
-        "viewCounts": 1,
-        "createdAt": "2022-04-20T13:43:42.000Z",
-        "updatedAt": "2022-04-22T07:26:39.214Z",
-        "CategoryId": 5,
-        "Category": {
-            "id": 5,
-            "name": "素食料理",
-            "createdAt": "2022-04-20T13:43:42.000Z",
-            "updatedAt": "2022-04-20T13:43:42.000Z"
-        },
-        "FavoritedUsers": [],
-        "LikedUsers": [],
-        "Comments": [
-            {
-                "id": 101,
-                "text": "Libero nihil itaque non.",
-                "UserId": 2,
-                "RestaurantId": 1,
-                "createdAt": "2022-04-20T13:43:42.000Z",
-                "updatedAt": "2022-04-20T13:43:42.000Z",
-                "User": {
-                    "id": 2,
-                    "name": "user1",
-                    "email": "user1@example.com",
-                    "password": "$2a$10$yN9JXedUr/Nhw7hnWSMWmeQfa3oSA9XIcg9URoYP.hKiMlxwn01FG",
-                    "isAdmin": false,
-                    "image": null,
-                    "createdAt": "2022-04-20T13:43:42.000Z",
-                    "updatedAt": "2022-04-20T13:43:42.000Z"
-                }
-            },
-            {
-                "id": 51,
-                "text": "Consectetur id est et consequuntur ab amet provident.",
-                "UserId": 1,
-                "RestaurantId": 1,
-                "createdAt": "2022-04-20T13:43:42.000Z",
-                "updatedAt": "2022-04-20T13:43:42.000Z",
-                "User": {
-                    "id": 1,
-                    "name": "root",
-                    "email": "root@example.com",
-                    "password": "$2a$10$9lld7VMc6O3ejw7RYM/fyOoko6qLHjKskCxSTNN/0b.XvURZYMDxW",
-                    "isAdmin": true,
-                    "image": null,
-                    "createdAt": "2022-04-20T13:43:41.000Z",
-                    "updatedAt": "2022-04-20T13:43:41.000Z"
-                }
-            },
-            {
-                "id": 1,
-                "text": "Sapiente tenetur voluptatibus laboriosam sunt qui.",
-                "UserId": 3,
-                "RestaurantId": 1,
-                "createdAt": "2022-04-20T13:43:42.000Z",
-                "updatedAt": "2022-04-20T13:43:42.000Z",
-                "User": {
-                    "id": 3,
-                    "name": "user2",
-                    "email": "user2@example.com",
-                    "password": "$2a$10$8l3gfhD2zHyMgAxFMJlI6uMO6rPD5ug4chgehEP7hYB2hrELJFIGG",
-                    "isAdmin": false,
-                    "image": null,
-                    "createdAt": "2022-04-20T13:43:42.000Z",
-                    "updatedAt": "2022-04-20T13:43:42.000Z"
-                }
-            }
-        ]
-    },
-    "isFavorited": false,
-    "isLiked": false
-}
-const DummyUser = {
-  currentUser:{
-    "id": 1,
-    "name": "root",
-    "email": "root@example.com",
-    "image": null,
-    "isAdmin": true
-  },
-  isAuthenticated: true    
-}
+
 
 export default {
   name:'Restaurant',
@@ -137,45 +50,57 @@ export default {
         isLiked: false
       },
       restaurantComments: [],
-      currentUser: DummyUser.currentUser
+      
     }
   },
+  computed:{
+    ...mapState(['currentUser'])
+  },
   methods: {
-    /* eslint-disable */
-    fetchRestaurant(restaurantId){
-      const {restaurant, isFavorited,  isLiked} = DummyData
-      const {
-        id, 
-        name,
-        Category, 
-        image, 
-        opening_hours: openingHours, 
-        tel, 
-        address, 
-        description,
-        Comments 
-        } = restaurant
-
-      this.restaurant = {
-        id,
-        name,
-        categoryName: Category? Category.name : '未分類',
-        image,
-        openingHours,
-        tel,
-        address,
-        description,
-        isFavorited,
-        isLiked,      
+    async fetchRestaurant(restaurantId){
+      try{
+        const {data, statusText} = await restaurantsAPI.get({restaurantId})
+        if(statusText !== 'OK') {
+          throw new Error(statusText)
+        }
+        const {restaurant, isFavorited,  isLiked} = data      
+        const {
+          id, 
+          name,
+          Category, 
+          image, 
+          opening_hours: openingHours, 
+          tel, 
+          address, 
+          description,
+          Comments 
+          } = restaurant
+        this.restaurant = {
+          id,
+          name,
+          categoryName: Category? Category.name : '未分類',
+          image,
+          openingHours,
+          tel,
+          address,
+          description,
+          isFavorited,
+          isLiked,      
+        }
+        this.restaurantComments = Comments
+      }catch(error){
+        Toast.fire({
+          icon:'error',
+          title: '無法載入餐廳資料，請稍後再試'
+        })
       }
-      this.restaurantComments = Comments
+     
     },
     afterDeleteComment(commentId){
       console.log('after', commentId)
       this.restaurantComments = this.restaurantComments.filter(comment => comment.id != commentId)
     },
     afterCreateComment(payload){
-      console.log('comment')
       const {commentId, text, restaurantId} = payload
       this.restaurantComments.push({
         id: commentId,
@@ -189,6 +114,11 @@ export default {
       })
     }
 
+  },
+  beforeRouteUpdate(to, from, next){
+    const {id} = to.params
+    this.fetchRestaurant(id)
+    next()
   },
   created(){
     const {id} = this.$route.params
