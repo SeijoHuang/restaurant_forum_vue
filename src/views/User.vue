@@ -105,7 +105,7 @@ export default {
     const {id:userId} = this.$route.params
     this.fetchUser(userId)
   },
-  // 路由改變時，從新跟伺服器發送請求
+  // 路由改變時，從新跟伺服器發送請求，渲染收到的資料
   beforeRouteUpdate(to, from, next){
     const {id:userId} = to.params
     this.fetchUser(userId)

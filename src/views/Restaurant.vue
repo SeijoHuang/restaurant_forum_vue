@@ -101,6 +101,7 @@ export default {
       this.restaurantComments = this.restaurantComments.filter(comment => comment.id != commentId)
     },
     afterCreateComment(payload){
+      console.log(this.currentUser)
       const {commentId, text, restaurantId} = payload
       this.restaurantComments.push({
         id: commentId,
