@@ -45,8 +45,9 @@
            {{ currentUser.name || '使用者' }} 您好
          </router-link>
          <button
-           type="button" 
-           class="btn btn-sm btn-outline-success my-2 my-sm-0"
+            @click.prevent.stop ='logout'
+            type="button" 
+            class="btn btn-sm btn-outline-success my-2 my-sm-0"
           >
            登出
           </button>
@@ -62,6 +63,12 @@
 // seed data
 import {mapState} from 'vuex'
 export default {
+  methods:{
+    logout(){
+      this.$store.commit('revokeAuthentication')
+      this.$router.push({name:'sing_in'})
+    }
+  },
   computed: 
   {
     ...mapState(['currentUser', 'isAuthenticated'])
