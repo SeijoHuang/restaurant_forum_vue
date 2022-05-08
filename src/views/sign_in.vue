@@ -91,7 +91,7 @@ export default {
       }
       //伺服器回傳的token存進localStorage                  
       localStorage.setItem('token', data.token)
-      //setCurrentUser方法把使用者資料傳入vuex的state中
+      //setCurrentUser方法把使用者資料傳入vuex的state中，其實下方這段程式碼"this.$store.commit"可以省略，因為已經在router index.js中透過 beforeEach向伺服器取得currentUser的資料，並且可供全域使用
       this.$store.commit('setCurrentUser', data.user)
       this.$router.push('/restaurants')
       } catch (error) {
