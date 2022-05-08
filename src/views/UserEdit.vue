@@ -61,11 +61,11 @@ export default {
     }
   },
   methods:{
-    fetchCurrentUser(){
+    fetchCurrentUser(currentUserId){
       //如果路由參數的id 不等於currentUser id 跳轉到not found
       const {id:paramsId} = this.$route.params
-      if(paramsId !== this.currentUser.id) {
-        this.$router.push({name: 'not_found'})
+      if(paramsId !== currentUserId) {
+        this.$router.push('/404')
       }
       const {id, name, image} = this.currentUser
       this.currentUserData = {
@@ -117,23 +117,29 @@ export default {
           icon: 'error',
           title: '無法儲存編輯，請稍後再試'
         })
-      }
-      
+      }      
     }
   },
   watch:{
-    currentUser(newValue){
-      this.currentUserData= {
-        ...this.currentUser,
-        ...newValue
-      }
+    currentUser(user){
+      if (user.id === -1) return
+      const { id } = this.$route.params
+      this.fetchCurrentUser(id)
     }
   },
   computed:{
     ...mapState(['currentUser'])
   }, 
+  beforeRouteUpdate (to, from, next) {
+    if (this.currentUser.id === -1) return
+    const { id } = to.params
+    this.fetchCurrentUser(id)
+    next()
+  },
   created(){
-    this.fetchCurrentUser()
+    if (this.currentUser.id === -1) return
+    const {id: currentUserId} = this.$route.params
+    this.fetchCurrentUser(currentUserId)
   }
 }
 </script>
