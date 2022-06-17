@@ -133,7 +133,7 @@ router.beforeEach( async (to, from, next) => {
 
   //如果有token = 已經通過使用者認證，那就呼叫store裡的action傳送請求到伺服器取得當前使用者資料，且因為在action中有設定取得成功會return true，因此isAuthenticated狀態會切換為true
 
-//先比對state裡的token和localStorage裡的token是否一樣，如果不一樣再重新發送請求
+//先比對state裡的token和localStorage裡的token是否一樣，如果不一樣，有可能token過期了，再重新發送請求
   if (tokenInLocalStorage && tokenInLocalStorage !== tokenInStore){
     isAuthenticated = await store.dispatch('fetchCurrentUser')
   }
