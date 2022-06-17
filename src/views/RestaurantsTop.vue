@@ -1,28 +1,32 @@
 <template>
   <div class="container py-5">
     <NavTab />
-    <h1 class="mt-5">
-      人氣餐廳
-    </h1>
+    <Spinner v-if="isLoading" />
+    <template v-else>
+      <h1 class="mt-5">
+        人氣餐廳
+      </h1>
 
-    <hr>
-    <div
-      class="card mb-3"
-      style="max-width: 540px;margin: auto;"
-    >  
-      <RestaurantsTopCard 
-        v-for=" restaurant in restaurants"
-        :key="restaurant.id"
-        :initial-restaurants-top="restaurant"
-        @after-remove-favorite="afterRemoveFavorite"
-        @after-add-favorite="afterAddFavorite"
-      />
-      
-    </div>
+      <hr>
+      <div
+        class="card mb-3"
+        style="max-width: 540px;margin: auto;"
+      >  
+        <RestaurantsTopCard 
+          v-for=" restaurant in restaurants"
+          :key="restaurant.id"
+          :initial-restaurants-top="restaurant"
+          @after-remove-favorite="afterRemoveFavorite"
+          @after-add-favorite="afterAddFavorite"
+        />
+        
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
+import Spinner from './../components/Spinner.vue'
 import NavTab from './../components/NavTab.vue'
 import RestaurantsTopCard from './../components/RestaurantsTopCard.vue'
 import restaurantsAPI from './../apis/restaurants'
@@ -35,22 +39,27 @@ export default {
   components : {
     NavTab,
     RestaurantsTopCard,
+    Spinner
   },
   data() {
     return {
       restaurants: [],
+      isLoading: false
     }
   },
   methods: {
     async fetchRestaurants(){
       try{
+        this.isLoading = true
         const response = await restaurantsAPI.getRestaurantTops()
         if (response.statusText !== 'OK'){
           throw new Error(response.statusText)
         }
         const {restaurants} = response.data
         this.restaurants = restaurants
+         this.isLoading = false
       }catch(error){
+        this.isLoading = false
         console.log(error)
         Toast.fire({
           icon: 'error',

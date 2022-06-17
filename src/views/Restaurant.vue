@@ -1,24 +1,28 @@
 <template>
   <div class="container py-5">
+    <Spinner v-if="isLoading"/>
     <!-- 餐廳資訊頁 RestaurantDetail -->
-    <RestaurantDetail
-      :initial-restaurant="restaurant"
-    />
-     <hr>
-      <!-- 餐廳評論 RestaurantComments -->
-    <RestaurantComments
-      :restaurant-comments="restaurantComments"
-      @after-delete-comment="afterDeleteComment"
-    />
-    <!-- 新增評論 CreateComment -->
-    <CreateComment 
-      :restaurantId="restaurant.id"
-      @after-create-comment="afterCreateComment"
-    />
+    <template v-else>
+      <RestaurantDetail
+        :initial-restaurant="restaurant"
+      />
+      <hr>
+        <!-- 餐廳評論 RestaurantComments -->
+      <RestaurantComments
+        :restaurant-comments="restaurantComments"
+        @after-delete-comment="afterDeleteComment"
+      />
+      <!-- 新增評論 CreateComment -->
+      <CreateComment 
+        :restaurantId="restaurant.id"
+        @after-create-comment="afterCreateComment"
+      />
+    </template>
   </div>
 </template>
 
 <script>
+import Spinner from './../components/Spinner.vue'
 import RestaurantDetail from './../components/RestaurantDetail.vue'
 import RestaurantComments from './../components/RestaurantComments.vue'
 import CreateComment from '../components/CreateComment.vue'
@@ -33,7 +37,8 @@ export default {
   components: {
     RestaurantDetail,
     RestaurantComments,
-    CreateComment
+    CreateComment,
+    Spinner
   },
   data(){
     return {
@@ -50,7 +55,7 @@ export default {
         isLiked: false
       },
       restaurantComments: [],
-      
+      isLoading: false
     }
   },
   computed:{
@@ -59,6 +64,7 @@ export default {
   methods: {
     async fetchRestaurant(restaurantId){
       try{
+        this.isLoading = true
         const {data, statusText} = await restaurantsAPI.get({restaurantId})
         if(statusText !== 'OK') {
           throw new Error(statusText)
@@ -88,7 +94,9 @@ export default {
           isLiked,      
         }
         this.restaurantComments = Comments
+        this.isLoading = false
       }catch(error){
+        this.isLoading = true
         Toast.fire({
           icon:'error',
           title: '無法載入餐廳資料，請稍後再試'

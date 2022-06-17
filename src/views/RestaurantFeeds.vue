@@ -1,23 +1,25 @@
 <template>
   <div class="container py-5">
     <NavTab />
-
-    <h1 class="mt-5">
-      最新動態
-    </h1>
-    <hr>
-    <div class="row">
-      <div class="col-md-6">
-        <h3>最新餐廳</h3>
-        <!-- 最新餐廳 NewestRestaurants -->
-        <NewestRestaurants :restaurants="restaurants"/>
+    <Spinner v-if="isLoading"/>
+    <template v-else>
+      <h1 class="mt-5">
+        最新動態
+      </h1>
+      <hr>
+      <div class="row">
+        <div class="col-md-6">
+          <h3>最新餐廳</h3>
+          <!-- 最新餐廳 NewestRestaurants -->
+          <NewestRestaurants :restaurants="restaurants"/>
+        </div>
+        <div class="col-md-6">
+          <!-- 最新評論 NewestComments-->
+          <h3>最新評論</h3>
+          <NewestComment :comments="comments"/>
+        </div>
       </div>
-      <div class="col-md-6">
-        <!-- 最新評論 NewestComments-->
-        <h3>最新評論</h3>
-        <NewestComment :comments="comments"/>
-      </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -25,6 +27,7 @@
 import NavTab from './../components/NavTab.vue'
 import NewestRestaurants from './../components/NewestRestaurant.vue'
 import NewestComment from './../components/NewestComment.vue'
+import Spinner from './../components/Spinner.vue'
 import restaurantsAPI from './../apis/restaurants'
 import {Toast} from './../utils/helpers'
 export default {
@@ -32,17 +35,20 @@ export default {
   components : {
     NavTab,
     NewestRestaurants,
-    NewestComment
+    NewestComment,
+    Spinner
   },
   data() {
     return {
       restaurants:[],
-      comments:[]
+      comments:[],
+      isLoading: false
     }
   },
   methods: {
     async fetchData() {
         try{
+            this.isLoading = true
             const response = await restaurantsAPI.getFeeds()
             if(response.statusText !== 'OK') {
                 throw new Error(response.statusText)
@@ -51,7 +57,9 @@ export default {
             this.restaurants = restaurants
             this.comments = comments.filter(comment => comment.Restaurant && comment.text)  
             // 已移除的餐廳或是沒有評論的資料在回傳資料中會是null，因此這步驟先過濾排除掉
+            this.isLoading = false
         } catch(err){
+            this.isLoading = false
             Toast.fire({
                 icon: 'error',
                 title: '無法取的最新消息，請稍後再試'
