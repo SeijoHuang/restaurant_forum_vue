@@ -114,7 +114,6 @@ export default {
         ...this.userProfile,
         isFollowed: true
       }
-      // this.$emit('after-follow', this.userProfile)
     },
     async unFollow(userId){
     //TODO API請求移除最愛
